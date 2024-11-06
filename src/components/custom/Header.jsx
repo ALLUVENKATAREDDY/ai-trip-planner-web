@@ -57,9 +57,7 @@ function Header() {
             <Link to="/create-trip">
               <Button variant="outline" className="rounded-full">Create Trip</Button>
             </Link>
-            <Link to="/my-trip">
-              <Button variant="outline" className="rounded-full">My Trip</Button>
-            </Link>
+           
             <Link to="/contact-us">
               <Button variant="outline" className="rounded-full">Contact us</Button>
             </Link>
