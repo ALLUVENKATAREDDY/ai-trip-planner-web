@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import  { useRef } from 'react';
 import emailjs from '@emailjs/browser';
 
 export const Contact = () => {
@@ -24,14 +24,18 @@ export const Contact = () => {
 
   return (
     <div className="flex flex-col justify-center items-center min-h-[70vh] bg-gray-100 p-4">
-      <div className="flex flex-col md:flex-row h-auto md:h-[400px] w-full md:w-4/5 lg:w-3/5 bg-white rounded-lg shadow-md mb-8 ">
+      
+      {/* Project Team Members Heading */}
+      <h2 className="text-3xl font-bold text-gray-800 mb-6">Contact Us</h2>
+
+      <div className="flex flex-col md:flex-row h-auto md:h-[400px] w-full md:w-4/5 lg:w-3/5 bg-white rounded-lg shadow-md mb-8">
         
         {/* Left card (image) */}
         <div
           className="flex flex-1 rounded-t-lg md:rounded-l-lg md:rounded-tr-none"
           style={{
             backgroundImage: "url('https://res.cloudinary.com/dmbkmxijw/image/upload/v1729824270/contact2_mmbpho.png')",
-            backgroundSize: 'contain', // Show the full image
+            backgroundSize: 'contain',
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'center',
           }}
@@ -71,6 +75,24 @@ export const Contact = () => {
           </form>
         </div>
       </div>
+      
+      {/* Team Members Cards */}
+      <h2 className="text-3xl font-bold text-gray-800 mb-6">Project Team Members</h2>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full md:w-4/5 lg:w-3/5 mb-8">
+        {['Anjili', 'Lokeswari', 'Prabhakar', 'Mallesh', 'Venkat Reddy'].map(member => (
+          <div key={member} className="flex flex-col items-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg hover:scale-110 transition-transform duration-200 cursor-pointer">
+            <img
+              src={`https://via.placeholder.com/100?text=${member.charAt(0)}`}
+              alt={`${member}`}
+              className="w-24 h-24 rounded-full mb-4"
+            />
+            <h3 className="text-xl font-semibold text-gray-700">{member}</h3>
+          </div>
+        ))}
+      </div>
+
+      {/* Contact Form and Image */}
+    
     </div>
   );
 };
