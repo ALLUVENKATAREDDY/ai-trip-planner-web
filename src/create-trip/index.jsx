@@ -6,23 +6,12 @@ import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { chatSession } from '@/service/AIModal';
 import { doc, setDoc } from 'firebase/firestore';
 import { db } from '@/service/firebaseConfig';
-import { FcGoogle } from "react-icons/fc";
-import axios from 'axios';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { useGoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
 
 function CreateTrip() {
   const [formData, setFormData] = useState({});
-  const [openDialog, setOpenDialog] = useState(false);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate(); // Ensure navigate is imported
+  const navigate = useNavigate();
 
   const handleInputChange = (name, value) => {
     setFormData((prevData) => ({
@@ -36,21 +25,14 @@ function CreateTrip() {
   }, [formData]);
 
   const GenerateTrip = async () => {
-    const user = localStorage.getItem("user");
-    if (!user) {
-      setOpenDialog(true);
-      return;
-    }
-
     const days = parseInt(formData.days, 10);
     
-    // Validate input
     if (!formData.days || !formData.location || !formData.budget || !formData.traveller) {
       toast.error("Please fill all details and ensure the trip is 5 days or less.");
       return;
     }
 
-    if (days > 5) {
+    if (days > 20) {
       toast.error("Please ensure the trip is 5 days or less.");
       return;
     }
@@ -76,14 +58,12 @@ function CreateTrip() {
   };
 
   const SaveAiTrip = async (TripData) => {
-    const user = JSON.parse(localStorage.getItem("user"));
     const docId = Date.now().toString();
 
     try {
       await setDoc(doc(db, "AITrips", docId), {
         userSelection: formData,
         tripData: JSON.parse(TripData),
-        userEmail: user.email,
         id: docId,
       });
 
@@ -92,35 +72,6 @@ function CreateTrip() {
     } catch (error) {
       console.error("Error saving trip:", error);
       toast.error("Error saving trip.");
-    }
-  };
-
-  const login = useGoogleLogin({
-    onSuccess: (codeResp) => {
-      console.log(codeResp);
-      GetUserProfile(codeResp);
-    },
-    onError: (error) => {
-      console.log(error);
-    }
-  });
-
-  const GetUserProfile = async (tokenInfo) => {
-    try {
-      const response = await axios.get('https://www.googleapis.com/oauth2/v1/userinfo', {
-        headers: {
-          Authorization: `Bearer ${tokenInfo.access_token}`,
-          Accept: 'application/json',
-        },
-      });
-
-      console.log(response.data);  // Log the user profile data
-      localStorage.setItem('user', JSON.stringify(response.data));  // Store user data in local storage
-      setOpenDialog(false);
-      GenerateTrip();  // Call GenerateTrip after successful login
-    } catch (error) {
-      console.error('Error fetching user profile:', error.response ? error.response.data : error.message);
-      toast.error("Error fetching user profile.");
     }
   };
 
@@ -167,29 +118,6 @@ function CreateTrip() {
               <div className="p-4">
                 <h2 className="text-lg font-semibold">{eachItem.title}</h2>
                 <p className="text-gray-600 text-sm mt-2">{eachItem.Description}</p>
-                <div className="mt-3">
-                  <h3 className="font-semibold">Options:</h3>
-                  {eachItem.options && eachItem.options.cheap ? (
-                    <p>{eachItem.options.cheap.activity}: {eachItem.options.cheap.price}</p>
-                  ) : (
-                    <p>No cheap options available</p>
-                  )}
-                  {eachItem.options && eachItem.options.conscious ? (
-                    <p>{eachItem.options.conscious.activity}: {eachItem.options.conscious.price}</p>
-                  ) : (
-                    <p>No conscious options available</p>
-                  )}
-                  {eachItem.options && eachItem.options.average ? (
-                    <p>{eachItem.options.average.activity}: {eachItem.options.average.price}</p>
-                  ) : (
-                    <p>No average options available</p>
-                  )}
-                  {eachItem.options && eachItem.options.luxury ? (
-                    <p>{eachItem.options.luxury.activity}: {eachItem.options.luxury.price}</p>
-                  ) : (
-                    <p>No luxury options available</p>
-                  )}
-                </div>
               </div>
             </div>
           ))}
@@ -203,7 +131,7 @@ function CreateTrip() {
             <div
               key={companion.id}
               onClick={() => handleInputChange('traveller', companion.people)}
-              className={`p bg-white shadow-lg rounded-lg overflow-hidden border transition-transform transform hover:scale-110 hover:shadow-2xl cursor-pointer 
+              className={`p bg-white shadow-lg rounded-lg overflow-hidden border transition-transform transform hover:scale-110 hover:shadow-2xl cursor-pointer p-5
                 ${formData.traveller === companion.people ? 'shadow-2xl border-black' : 'border-gray-200'}`}
             >
               <span className="text-3xl">{companion.icon}</span>
@@ -224,29 +152,6 @@ function CreateTrip() {
           {loading ? <AiOutlineLoading3Quarters className='h-7 w-7 animate-spin' /> : "Generate Trip"}
         </button>
       </div>
-
-      <Dialog open={openDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogDescription>
-              <img
-                src="https://res.cloudinary.com/drwvfwj4b/image/upload/v1729789278/tubyq1gbopynul0hswjk.jpg"
-                className="top-0 left-0 w-15 sm:w-20 md:w-23 lg:w-17 xl:w-31 h-auto rounded-md"
-                alt="Top-left travel image"
-              />
-              <DialogTitle className="font-bold text-lg mt-7 text-black">Login Required</DialogTitle>
-              <p className="text-black">Sign in to the App with Google authentication securely</p>
-              <button
-                disabled={loading}
-                onClick={login}
-                className="flex flex-row gap-4 justify-center items-center bg-black h-10 w-full mt-5 text-white font-semibold py-2 rounded-md"
-              >
-                <FcGoogle className='h-7 w-7' /> Sign In With Google
-              </button>
-            </DialogDescription>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
