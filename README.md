@@ -4,6 +4,9 @@ The AI Travel Planner is an intelligent and user-centric application designed to
 ### GitHub Repository
 You can access the project on GitHub here: https://github.com/ALLUVENKATAREDDY/ai-trip-planner-web
 
+### Vercel
+website url:https://ai-trip-planner-web-6jdd.vercel.app/
+
 ### Key Features
 ## 1. Destination Search
 Explore a vast database of global destinations and filter them based on preferences such as budget, duration, and travel category.
