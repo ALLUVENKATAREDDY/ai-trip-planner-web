@@ -1,96 +1,172 @@
-import { useState } from 'react';
-import { Button } from '../ui/button';
-import { Popover, PopoverTrigger } from "@/components/ui/popover";
-import { googleLogout, useGoogleLogin } from '@react-oauth/google';
-import { FcGoogle } from 'react-icons/fc';
-import axios from 'axios';
-import { Link } from 'react-router-dom';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { auth } from "../../service/firebaseConfig";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
+import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai"; // Import icons for mobile menu
 
-function Header() {
-   const [openDialog, setOpenDialog] = useState(false);
-   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")) || null);
+const Header = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // State for mobile menu
 
-   const login = useGoogleLogin({
-     onSuccess: (codeResp) => {
-       GetUserProfile(codeResp);
-     },
-     onError: (error) => {
-       console.error("Login failed:", error);
-     }
-   });
+  // Check if user is logged in
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setIsAuthenticated(!!user);
+    });
+    return () => unsubscribe();
+  }, []);
 
-   const GetUserProfile = (tokenInfo) => {
-     axios.get('https://www.googleapis.com/oauth2/v1/userinfo', {
-       headers: {
-         Authorization: `Bearer ${tokenInfo.access_token}`,
-         Accept: 'application/json',
-       },
-     })
-     .then((resp) => {
-       console.log("User profile data:", resp.data);
-       localStorage.setItem('user', JSON.stringify(resp.data));
-       setUser(resp.data);
-       setOpenDialog(false);
-     })
-     .catch((error) => {
-       console.error('Error fetching user profile:', error);
-     });
-   };
+  // Handle Signup/Login
+  const handleAuth = async (e) => {
+  e.preventDefault();
+  setError("");
 
-   const handleLogout = () => {
-     googleLogout();
-     localStorage.removeItem("user");
-     setUser(null);
-   };
+  if (!email || !password || password.length < 6) {
+    setError("Enter a valid email and password (at least 6 characters).");
+    return;
+  }
+
+  try {
+    if (isSignUp) {
+      await createUserWithEmailAndPassword(auth, email, password);
+    } else {
+      await signInWithEmailAndPassword(auth, email, password);
+    }
+
+    setShowAuthDialog(false);
+    // Clear the form fields after submission
+    setEmail("");
+    setPassword("");
+  } catch (err) {
+    setError(err.message);
+  }
+};
+
+  // Logout User
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      setIsAuthenticated(false);
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
 
   return (
-    <div className="p-3 shadow-md flex justify-between items-center w-screen px-5 bg-white">
-      <Link to="/">
-        <img src="https://res.cloudinary.com/drwvfwj4b/image/upload/v1729789278/tubyq1gbopynul0hswjk.jpg" alt="Logo" className="h-12 sm:h-16 md:h-20 lg:h-24" />
-      </Link>
-      <div>
-        {user ? (
-          <div className='flex items-center gap-3'>
-            <Link to="/create-trip">
-              <Button variant="outline" className="rounded-full">Create Trip</Button>
-            </Link>
-            <Link to="/contact-us">
-              <Button variant="outline" className="rounded-full">Contact us</Button>
-            </Link>
-            <Popover>
-              <PopoverTrigger>
-                <button onClick={handleLogout} className='bg-black text-white font-semibold py-2 px-4 rounded-md shadow-md hover:bg-gray-800 transition duration-200'>Log Out</button>
-              </PopoverTrigger>
-            </Popover>
-          </div>
-        ) : (
-          <button 
-            className="bg-black text-white font-semibold py-2 px-4 rounded-md shadow-md hover:bg-gray-800 transition duration-200" 
-            onClick={() => setOpenDialog(true)}
-          >
-            Sign In
-          </button>
-        )}
-      </div>
+    <>
+      <header className="fixed top-0 left-0 w-full h-16 bg-gray-800 text-white p-4 flex justify-between items-center shadow-md z-50">
 
-      {/* Sign In Dialog */}
-      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="font-bold text-lg mt-7 text-black">Login Required</DialogTitle>
-            <DialogDescription>
-              <img src="https://res.cloudinary.com/drwvfwj4b/image/upload/v1729789278/tubyq1gbopynul0hswjk.jpg" className="top-0 left-0 w-15 sm:w-20 md:w-23 lg:w-17 xl:w-31 h-auto rounded-md" alt="Top-left travel image" />
-              <p className="text-black">Sign in to the App with Google authentication securely</p>
-              <button onClick={login} className="flex flex-row gap-4 justify-center items-center bg-black h-10 w-full mt-5 text-white font-semibold py-2 rounded-md">
-                <FcGoogle className='h-7 w-7' /> Sign In With Google
+        {/* Logo */}
+        <div className="text-2xl font-bold">
+          <Link to="/" className="hover:text-gray-300">My App</Link>
+        </div>
+
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex space-x-6">
+          <Link to="/" className="hover:text-gray-300">Home</Link>
+          <Link to="/contact" className="hover:text-gray-300">Contact</Link>
+        </nav>
+
+        {/* Authentication Buttons */}
+        <div className="hidden md:flex space-x-4">
+          {isAuthenticated ? (
+            <button onClick={handleLogout} className="bg-red-600 px-4 py-2 rounded-md hover:bg-red-700">
+              Logout
+            </button>
+          ) : (
+            <>
+              <button onClick={() => { setIsSignUp(true); setShowAuthDialog(true); }} className="bg-blue-600 px-4 py-2 rounded-md hover:bg-blue-700">
+                Sign Up
               </button>
-            </DialogDescription>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
-    </div>
+              <button onClick={() => { setIsSignUp(false); setShowAuthDialog(true); }} className="bg-green-600 px-4 py-2 rounded-md hover:bg-green-700">
+                Login
+              </button>
+            </>
+          )}
+        </div>
+
+        {/* Mobile Menu Button */}
+        <button className="md:hidden" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+          {isMobileMenuOpen ? <AiOutlineClose size={28} /> : <AiOutlineMenu size={28} />}
+        </button>
+      </header>
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="fixed top-16 left-0 w-full bg-gray-800 text-white p-6 flex flex-col space-y-4 md:hidden">
+          <Link to="/" className="hover:text-gray-300" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
+          <Link to="/contact" className="hover:text-gray-300" onClick={() => setIsMobileMenuOpen(false)}>Contact</Link>
+
+          {isAuthenticated ? (
+            <button onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} className="bg-red-600 px-4 py-2 rounded-md hover:bg-red-700">
+              Logout
+            </button>
+          ) : (
+            <>
+              <button onClick={() => { setIsSignUp(true); setShowAuthDialog(true); setIsMobileMenuOpen(false); }} className="bg-blue-600 px-4 py-2 rounded-md hover:bg-blue-700">
+                Sign Up
+              </button>
+              <button onClick={() => { setIsSignUp(false); setShowAuthDialog(true); setIsMobileMenuOpen(false); }} className="bg-green-600 px-4 py-2 rounded-md hover:bg-green-700">
+                Login
+              </button>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Authentication Dialog */}
+      {showAuthDialog && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 className="text-xl font-bold mb-4">{isSignUp ? "Sign Up" : "Login"}</h2>
+
+            <form onSubmit={handleAuth}>
+              <div>
+                <label>Email</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="border rounded p-2 w-full bg-white"
+                />
+              </div>
+              <div>
+                <label>Password</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="border rounded p-2 w-full bg-white"
+                />
+              </div>
+
+              {error && <p className="text-red-500">{error}</p>}
+
+              <div className="flex justify-between mt-4">
+                <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                  {isSignUp ? "Sign Up" : "Login"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowAuthDialog(false)}
+                  className="bg-gray-400 px-4 py-2 rounded-md hover:bg-gray-500"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
   );
-}
+};
 
 export default Header;

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 function Hero() {
   return (
-    <div className='mt-10 mb-0'>
+    <div className='mt-10 mb-0 pt-16'>
     <h1 className="font-extrabold  text-center mt-2 text-2xl sm:text-3xl md:text-4xl">
     Travel Journal
 </h1>

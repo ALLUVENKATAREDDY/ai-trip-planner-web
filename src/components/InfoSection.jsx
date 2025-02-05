@@ -12,8 +12,8 @@ function InfoSection({ trip }) {
     }
 
     return (
-        <div>
-            <img src="https://res.cloudinary.com/df67zy4wm/image/upload/v1729792396/g5yvu1zajm1s9v5v0vgp.avif " 
+        <div className="pt-16">
+           <img src="https://res.cloudinary.com/df67zy4wm/image/upload/v1729792396/g5yvu1zajm1s9v5v0vgp.avif " 
             className="h-[340px] w-full object-cover rounded "
                 alt="Trip cover"
             />

@@ -1,9 +1,9 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-import { getFirestore } from "firebase/firestore"; // Corrected import
+// src/service/firebaseConfig.jsx
+import { initializeApp } from 'firebase/app';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';  // Import getFirestore
 
-// Your web app's Firebase configuration
+// Firebase configuration object (use your Firebase project details here)
 const firebaseConfig = {
   apiKey: "AIzaSyBTpuywTtQdcDcfzAPACOkt4FMfwjsBAVI",
   authDomain: "ai-travel-planner-34d1f.firebaseapp.com",
@@ -14,7 +14,12 @@ const firebaseConfig = {
   measurementId: "G-4PWC9H7BDF"
 };
 
-// Initialize Firebase
-export const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app); // Correct usage
-// const analytics = getAnalytics(app); // Uncomment if needed
+// Initialize Firebase app
+const app = initializeApp(firebaseConfig);
+
+// Initialize Firebase Auth
+const auth = getAuth(app);
+// Initialize Firestore
+export const db = getFirestore(app);  // Now db is correctly initialized and exported
+// Export necessary methods
+export { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut };
