@@ -19,17 +19,15 @@ function PlacesToVisit({ trip }) {
           const item = itinerary[dayKey];
           return (
             <div key={dayKey}>
-              <h2 className="font-medium text-lg">Day {dayKey}</h2>
+              <h2 className="font-medium text-lg"> {dayKey}</h2>
               <div className="grid md:grid-cols-2 gap-5">
-                {Array.isArray(item.plan) && item.plan.length > 0 ? (
+                {Array.isArray(item.plan) && item.plan.length > 0 
                   item.plan.map((place, idx) => (
                     <div key={idx} className="my-3">
                       <PlaceCardItem place={place} />
                     </div>
                   ))
-                ) : (
-                  <div>No places planned for this day</div>
-                )}
+                }
               </div>
             </div>
           );
