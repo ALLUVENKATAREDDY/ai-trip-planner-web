@@ -47,25 +47,28 @@ export const Contact = () => {
             
             <label className="block font-semibold mb-1 mt-2">Name</label>
             <input
-              type="text"
-              name="from_name"
-              className="w-full mb-3 p-2 border border-gray-300 rounded"
-            />
+  type="text"
+  name="from_name"
+ className="w-full p-2 border border-gray-300 rounded-md bg-white text-black"
+
+/>
 
             <label className="block font-semibold mb-2">Email</label>
             <input
-              type="email"
-              name="email_id"
-              className="w-full mb-3 p-2 border border-gray-300 rounded"
-            />
+  type="email"
+  name="email_id"
+ className="w-full p-2 border border-gray-300 rounded-md bg-white text-black"
+
+/>
 
             <label className="block font-semibold mb-2">Message</label>
             <textarea
-              name="message"
-              cols="15"
-              rows="4"
-              className="w-full mb-3 p-2 border border-gray-300 rounded"
-            />
+  name="message"
+  cols="15"
+  rows="4"
+ className="w-full p-2 border border-gray-300 rounded-md bg-white text-black"
+
+/>
 
             <input
               type="submit"

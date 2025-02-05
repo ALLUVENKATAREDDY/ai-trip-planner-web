@@ -88,7 +88,7 @@ function CreateTrip() {
           <input
             type="text"
             placeholder="Enter a destination"
-            className="w-full p-2 border border-gray-300 rounded-md"
+           className="w-full p-2 border border-gray-300 rounded-md bg-white text-black"
             onChange={(e) => handleInputChange('location', e.target.value)}
           />
         </div>
@@ -98,7 +98,7 @@ function CreateTrip() {
           <input
             placeholder="Ex. 3"
             type="number"
-            className="w-full p-2 border border-gray-300 rounded-md"
+           className="w-full p-2 border border-gray-300 rounded-md bg-white text-black"
             onChange={(e) => handleInputChange('days', e.target.value)}
           />
         </div>

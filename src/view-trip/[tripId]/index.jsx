@@ -24,6 +24,7 @@ function ViewTrip() {
         {
             console.log("Document:",docSnap.data());
             setTrip(docSnap.data());
+            
         }
         else{
             console.log("No Such Document");
@@ -45,7 +46,7 @@ function ViewTrip() {
     {/*Daily Plan */}
     <PlacesToVisit trip={trip} />
 
-    {/*Footer */}
+
 
     </div>
   )
